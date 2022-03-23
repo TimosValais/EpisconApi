@@ -12,16 +12,29 @@ namespace EpisconApi
 
         private void btnConnect_Click(object sender, EventArgs e)
         {
-            this.GetTextBoxData();
+            try
+            {
+                this.GetTextBoxData();
+                MessageBox.Show($"Connection string : {_dbConnString}, UserName : {_dbUserName}, Password : {_dbPassword}");
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+
+            }
+
         }
 
         private void GetTextBoxData()
         {
             if(String.IsNullOrEmpty(this.tbDatabaseConnString.Text) || String.IsNullOrEmpty(this.tbDatabaseUsername.Text) || String.IsNullOrEmpty(this.tbDatabasePass.Text))
             {
-                throw new ApplicationException("None of the values can be empty");
+                throw new Exception(Constants.ErrorMessages.MultipleEmptyValues);
             }
-            throw new NotImplementedException();
+            _dbConnString = this.tbDatabaseConnString.Text;
+            _dbUserName = this.tbDatabaseUsername.Text;
+            _dbPassword = this.tbDatabasePass.Text;
         }
     }
 }
