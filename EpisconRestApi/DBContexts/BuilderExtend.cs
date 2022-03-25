@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json; 
 using Microsoft.EntityFrameworkCore;
 using EpisconApi.Models;
+using EpisconApi.Services;
 
 namespace EpisconApi.DBContexts
 {
@@ -12,7 +13,6 @@ namespace EpisconApi.DBContexts
     {
         public static void Seed(this ModelBuilder builder)
         {
-           
         }
     }
 }

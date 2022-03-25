@@ -17,7 +17,7 @@ namespace EpisconApi.DBContexts
             builder.Entity<User>().HasOne(user => user.Address);
             builder.Entity<User>().HasMany(user => user.PhoneNumbers);
             builder.Entity<Purchase>().HasOne(purch => purch.User);
-            builder.Entity<Purchase>().HasMany(purch => purch.Products);
+            builder.Entity<Purchase>().HasOne(purch => purch.Product);
             builder.Entity<Rating>().HasOne(rating => rating.Product);
 
             builder.Seed();

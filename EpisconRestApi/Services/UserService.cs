@@ -1,6 +1,7 @@
 ﻿using EpisconApi.DBContexts;
 using EpisconApi.Models;
 using EpisconApi.Repositories;
+using Newtonsoft.Json;
 
 namespace EpisconApi.Services
 {
@@ -9,12 +10,14 @@ namespace EpisconApi.Services
         private AddressRepo _addressRepo;
         private UserRepo _userRepo;
         private PhoneNumberRepo _phoneNumberRepo;
+        private PurchaseService _purchaseService;
 
         public UserService(StoreContext context)
         {
             _addressRepo = new AddressRepo(context);
             _userRepo = new UserRepo(context);
             _phoneNumberRepo = new PhoneNumberRepo(context);
+            _purchaseService = new PurchaseService(context);
         }
 
         public void Create(User user)
@@ -26,15 +29,84 @@ namespace EpisconApi.Services
             foreach (User user in users)
             {
                 HandleSameAddress(user);
-                _addressRepo.AddOrUpdate(user.Address);
                 foreach (PhoneNumber phoneNumber in user.PhoneNumbers)
                 {
                     _phoneNumberRepo.AddOrUpdate(phoneNumber);
                 }
+            }
+            var addresses = users.Select(x => x.Address);
+            _addressRepo.AddOrUpdateRange(addresses);
+            _userRepo.AddOrUpdateRange(users);
 
-                _userRepo.AddOrUpdate(user);
+
+        }
+
+        public List<User> GetByIds(List<int> ids)
+        {
+            return _userRepo.GetByIds(ids);
+        }
+
+        public IEnumerable<User> GetSampleDataFromJson()
+        {
+            string jsonText = @"
+            [
+                {
+                    'userId': '1',
+                    'firstName': 'Joe',
+                    'lastName': 'Jackson',
+                    'gender': 'male',
+                    'age': 28,
+                    'address': {
+                        'streetAddress': '101',
+                        'city': 'San Diego',
+                        'state': 'CA'
+                    },
+                    'phoneNumbers': [
+                        {'type': 'home', 'number': '7349282382' }
+                    ]
+                },
+                {
+                    'userId': '2',
+                    'firstName': 'William',
+                    'lastName': 'Franklin',
+                    'gender': 'female',
+                    'age': 34,
+                    'address': {
+                        'streetAddress': '967',
+                        'city': 'Texas',
+                        'state': 'Texas'
+                    },
+                    'phoneNumbers': [
+                        {'type': 'mobile', 'number': '2342347097' }
+                    ]
+                }
+            ]";
+
+            try
+            {
+                IEnumerable<User> users = JsonConvert.DeserializeObject<IEnumerable<User>>(jsonText);
+                return users;
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("Serialize failed, data not in correct format");
             }
 
+        }
+
+        public List<User> GetUsersFromProduct(int productId)
+        {
+            List<int> userIds = new List<int>();
+            List<Purchase> purchases = _purchaseService.GetByProduct(productId).ToList();
+            foreach (var purchase in purchases)
+            {
+                if(!userIds.Any(userId => userId == purchase.UserId))
+                {
+                    userIds.Add(purchase.UserId);
+                }
+            }
+            return GetByIds(userIds);
         }
 
         public User GetById(int id)

@@ -27,6 +27,27 @@ namespace EpisconApi.Repositories
             }
             _storeContext.SaveChanges();
         }
+
+        public void AddOrUpdateRange(IEnumerable<Address> addresses)
+        {
+            if (addresses == null) throw new Exception("No Products Found");
+
+            foreach (Address address in addresses)
+            {
+                bool exists = _storeContext.Addresses.Any(u => u.AddressId == address.AddressId);
+                if (!exists)
+                {
+                    _storeContext.Addresses.Add(address);
+                }
+                else
+                {
+                    _storeContext.Addresses.Update(address);
+                }
+            }
+            _storeContext.SaveChanges();
+        }
+
+
         public Address GetById(int id)
         {
             return _storeContext.Addresses.FirstOrDefault(addr => addr.AddressId == id);

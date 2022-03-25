@@ -30,42 +30,10 @@ namespace EpisconApi.Controllers
         [HttpPut]
         public HttpResponseMessage UpdateFromSampleJson()
         {
-            string jsonText = @"
-            [
-                {
-                    'userId': '1',
-                    'firstName': 'Joe',
-                    'lastName': 'Jackson',
-                    'gender': 'male',
-                    'age': 28,
-                    'address': {
-                        'streetAddress': '101',
-                        'city': 'San Diego',
-                        'state': 'CA'
-                    },
-                    'phoneNumbers': [
-                        {'type': 'home', 'number': '7349282382' }
-                    ]
-                },
-                {
-                    'userId': '2',
-                    'firstName': 'William',
-                    'lastName': 'Franklin',
-                    'gender': 'female',
-                    'age': 34,
-                    'address': {
-                        'streetAddress': '967',
-                        'city': 'Texas',
-                        'state': 'Texas'
-                    },
-                    'phoneNumbers': [
-                        {'type': 'mobile', 'number': '2342347097' }
-                    ]
-                }
-            ]";
+
             try
             {
-                List<User> users = JsonConvert.DeserializeObject<List<User>>(jsonText);
+                List<User> users = _userService.GetSampleDataFromJson().ToList();
                 _userService.AddOrUpdateRange(users);
                 return new HttpResponseMessage(HttpStatusCode.OK);
             }
@@ -108,6 +76,22 @@ namespace EpisconApi.Controllers
                 return new HttpResponseMessage(HttpStatusCode.BadRequest);
             }
         }
+        [Route("GetUsersFromProduct/{productId}")]
+        [HttpGet]
+        public object GetUsersFromProduct(int productId)
+        {
+            try
+            {
+                List<User> users = _userService.GetUsersFromProduct(productId);
+                return users;
+            }
+            catch (Exception ex)
+            {
+
+                return new HttpResponseMessage(HttpStatusCode.BadRequest);
+            }
+        }
+        [Route("Delete/{id}")]
         [HttpDelete]
         public HttpResponseMessage Delete(int id)
         {
