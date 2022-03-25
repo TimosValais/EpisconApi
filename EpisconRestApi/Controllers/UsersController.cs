@@ -26,8 +26,9 @@ namespace EpisconApi.Controllers
             var users = _userService.GetAll().ToList();
             return JsonConvert.SerializeObject(users);
         }
+        [Route("UpdateFromSampleJson")]
         [HttpPut]
-        public HttpResponseMessage Update()
+        public HttpResponseMessage UpdateFromSampleJson()
         {
             string jsonText = @"
             [
@@ -72,7 +73,53 @@ namespace EpisconApi.Controllers
             {
                 return new HttpResponseMessage(HttpStatusCode.BadRequest);
             }
-           
+
+        }
+
+        [HttpPost]
+        public HttpResponseMessage Create(object user)
+        {
+            try
+            {
+                User userToCreate = JsonConvert.DeserializeObject<User>(Convert.ToString(user));
+                _userService.Create(userToCreate);
+                return new HttpResponseMessage(HttpStatusCode.OK);
+
+            }
+            catch (Exception ex)
+            {
+
+                return new HttpResponseMessage(HttpStatusCode.BadRequest);
+
+            }
+        }
+        [Route("Get/{id}")]
+        [HttpGet]
+        public object Get(int id)
+        {
+            try
+            {
+                User user = _userService.GetById(id);
+                return JsonConvert.SerializeObject(user);
+            }
+            catch (Exception ex)
+            {
+
+                return new HttpResponseMessage(HttpStatusCode.BadRequest);
+            }
+        }
+        [HttpDelete]
+        public HttpResponseMessage Delete(int id)
+        {
+            try
+            {
+                _userService.Delete(id);
+                return new HttpResponseMessage(HttpStatusCode.OK);
+            }
+            catch (Exception)
+            {
+                return new HttpResponseMessage(HttpStatusCode.BadRequest);
+            }
         }
     }
 }
