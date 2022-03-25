@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var connectionString = builder.Configuration.GetConnectionString("StoreDb");
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -11,8 +13,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 //add db context
-builder.Services.AddDbContext<StoreContext>(options =>
-            options.UseInMemoryDatabase("Store"));
+builder.Services.AddDbContext<StoreContext>(x => x.UseSqlServer(connectionString));
 
 var app = builder.Build();
 

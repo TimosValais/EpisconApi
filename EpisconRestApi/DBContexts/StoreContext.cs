@@ -12,6 +12,17 @@ namespace EpisconApi.DBContexts
         public StoreContext(DbContextOptions<StoreContext> options) : base(options)
         {}
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json")
+                .Build();
+
+            var connectionString = configuration.GetConnectionString("StoreDb");
+            optionsBuilder.UseSqlServer(connectionString);
+        }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<User>().HasOne(user => user.Address);

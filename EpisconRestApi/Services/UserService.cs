@@ -17,6 +17,10 @@ namespace EpisconApi.Services
             _phoneNumberRepo = new PhoneNumberRepo(context);
         }
 
+        public void Create(User user)
+        {
+            _userRepo.Create(user);
+        }
         public void AddOrUpdateRange(IEnumerable<User> users)
         {
             foreach (User user in users)
@@ -27,13 +31,16 @@ namespace EpisconApi.Services
                 {
                     _phoneNumberRepo.AddOrUpdate(phoneNumber);
                 }
-                //_storeContext.SaveChanges();
 
                 _userRepo.AddOrUpdate(user);
             }
 
         }
 
+        public User GetById(int id)
+        {
+            return _userRepo.GetById(id);
+        }
         private void HandleSameAddress(User user)
         {
             Address checkAddress = _addressRepo.GetByFields(user.Address);
@@ -58,6 +65,11 @@ namespace EpisconApi.Services
                 user.PhoneNumbers = _phoneNumberRepo.GetByUserId(user.UserId).ToList();
             }
             return users;
+        }
+
+        public void Delete(int id)
+        {
+            _userRepo.Delete(id);
         }
     }
 }
