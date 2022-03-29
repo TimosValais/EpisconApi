@@ -11,7 +11,7 @@ namespace EpisconApi.Services
     {
 
         private ProductRepo _productRepo;
-        private PurchaseService _purchaseService;
+        private PurchaseRepo _purchaseRepo;
 
 
         private const string _productApiUrl = "https://fakestoreapi.com/products/";
@@ -19,7 +19,7 @@ namespace EpisconApi.Services
         public ProductService(StoreContext context)
         {
             _productRepo = new ProductRepo(context);
-            _purchaseService = new PurchaseService(context);
+            _purchaseRepo = new PurchaseRepo(context);
 
         }
 
@@ -67,7 +67,7 @@ namespace EpisconApi.Services
         public List<Product> GetUsersFromProduct(int userId)
         {
             List<int> productsIds = new List<int>();
-            List<Purchase> purchases = _purchaseService.GetByProduct(userId).ToList();
+            List<Purchase> purchases = _purchaseRepo.GetByUserId(userId).ToList();
             foreach (var purchase in purchases)
             {
                 if (!productsIds.Any(productId => productId == purchase.ProductId))

@@ -10,14 +10,14 @@ namespace EpisconApi.Services
         private AddressRepo _addressRepo;
         private UserRepo _userRepo;
         private PhoneNumberRepo _phoneNumberRepo;
-        private PurchaseService _purchaseService;
+        private PurchaseRepo _purchaseRepo;
 
         public UserService(StoreContext context)
         {
             _addressRepo = new AddressRepo(context);
             _userRepo = new UserRepo(context);
             _phoneNumberRepo = new PhoneNumberRepo(context);
-            _purchaseService = new PurchaseService(context);
+            _purchaseRepo = new PurchaseRepo(context);
         }
 
         public void Create(User user)
@@ -98,7 +98,7 @@ namespace EpisconApi.Services
         public List<User> GetUsersFromProduct(int productId)
         {
             List<int> userIds = new List<int>();
-            List<Purchase> purchases = _purchaseService.GetByProduct(productId).ToList();
+            List<Purchase> purchases = _purchaseRepo.GetByProductId(productId).ToList();
             foreach (var purchase in purchases)
             {
                 if(!userIds.Any(userId => userId == purchase.UserId))
