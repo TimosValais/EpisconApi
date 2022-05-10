@@ -90,5 +90,38 @@ namespace EpisconApi.Controllers
                 return new HttpResponseMessage(HttpStatusCode.BadRequest);
             }
         }
+
+        [HttpPost("Add")]
+        public IActionResult Create(Product newProduct)
+        {
+            try
+            {
+                _productService.Create(newProduct);
+                return Ok($"Product was created {newProduct.ProductId}");
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+
+        }
+
+
+        [HttpPost("Update/{id}")]
+        public IActionResult Create(int id, [FromBody] Product product)
+        {
+            try
+            {
+                _productService.Update(id, product);
+                return Ok($"Product was updated {Newtonsoft.Json.JsonConvert.SerializeObject(_productService.GetById(id))}");
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+
+        }
     }
 }

@@ -43,7 +43,7 @@ namespace EpisconApi.Repositories
 
         public void Create(Product product)
         {
-            if (product == null) throw new Exception("User to be created was null");
+            if (product == null) throw new Exception("Product to be created was null");
             _storeContext.Products.Add(product);
             _storeContext.SaveChanges();
         }
@@ -104,6 +104,12 @@ namespace EpisconApi.Repositories
             }
             return products;
    
+        }
+
+        public void Update(Product product)
+        {
+            _storeContext.Products.Update(product);
+            _storeContext.SaveChanges();
         }
 
         public IEnumerable<Product> Search(string fieldName, string searchTerm)

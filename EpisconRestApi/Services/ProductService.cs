@@ -96,6 +96,25 @@ namespace EpisconApi.Services
             return products;
         }
 
+        public void Update(int id, Product product)
+        {
+            var checkProduct =_productRepo.GetById(id);
+            if (checkProduct == null) throw new Exception("Product Doesn't Exist");
+            CopyAllNonIdValues(ref checkProduct, product);
+            _productRepo.Update(checkProduct);
+        }
+
+        private void CopyAllNonIdValues(ref Product checkProduct, Product product)
+        {
+            PropertyInfo[] propInfos = typeof(Product).GetProperties();
+            foreach (PropertyInfo propInfo in propInfos)
+            {
+                if (propInfo.Name == nameof(Product.ProductId)) continue;
+                checkProduct.GetType().GetProperty(propInfo.Name).SetValue(checkProduct, propInfo.GetValue(product, null), null);
+            }
+
+        }
+
         public List<Product> GetProductsFromUser(int userId)
         {
             List<int> productsIds = new List<int>();
@@ -112,6 +131,10 @@ namespace EpisconApi.Services
         public List<Product> GetByIds(List<int> ids)
         {
             return _productRepo.GetByIds(ids);
+        }
+
+        public void Create(Product newProduct){
+            _productRepo.Create(newProduct);
         }
 
         private async Task<IEnumerable<Product>> GetAllFromApi()
