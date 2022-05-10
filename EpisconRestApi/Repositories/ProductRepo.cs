@@ -106,6 +106,27 @@ namespace EpisconApi.Repositories
    
         }
 
+        public void Delete(Product productToDelete)
+        {
+            _storeContext.Products.Remove(productToDelete);
+            _storeContext.SaveChanges();
+        }
+
+        public void DeleteRange(List<Product> products)
+        {
+            try
+            {
+                _storeContext.RemoveRange(products);
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
+            _storeContext.SaveChanges();
+
+        }
+
         public void Update(Product product)
         {
             _storeContext.Products.Update(product);

@@ -5,6 +5,7 @@ using EpisconApi.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using Newtonsoft.Json;
 
 namespace EpisconApi.Controllers
 {
@@ -81,8 +82,8 @@ namespace EpisconApi.Controllers
         {
             try
             {
-                List<Product> users = _productService.GetProductsFromUser(userId);
-                return users;
+                List<Product> products = _productService.GetProductsFromUser(userId);
+                return products;
             }
             catch (Exception ex)
             {
@@ -109,12 +110,12 @@ namespace EpisconApi.Controllers
 
 
         [HttpPost("Update/{id}")]
-        public IActionResult Create(int id, [FromBody] Product product)
+        public IActionResult Update(int id, [FromBody] Product product)
         {
             try
             {
                 _productService.Update(id, product);
-                return Ok($"Product was updated {Newtonsoft.Json.JsonConvert.SerializeObject(_productService.GetById(id))}");
+                return Ok($"Product was updated {JsonConvert.SerializeObject(_productService.GetById(id))}");
             }
             catch (Exception ex)
             {
@@ -122,6 +123,36 @@ namespace EpisconApi.Controllers
                 return BadRequest(ex.Message);
             }
 
+        }
+
+        [HttpDelete("Delete/{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
+            {
+                _productService.Delete(id);
+                return Ok("Item was deleted");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("DeleteRange")]
+        public async Task<IActionResult> DeleteRange([FromQuery] int[] ids)
+        {
+            try
+            {
+                IEnumerable<Product> products = _productService.DeleteRange(ids);
+
+                return Ok($"These products were deleted {JsonConvert.SerializeObject(products)}");
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

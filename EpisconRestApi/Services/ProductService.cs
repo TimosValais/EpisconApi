@@ -2,6 +2,7 @@
 using EpisconApi.Helpers;
 using EpisconApi.Models;
 using EpisconApi.Repositories;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Reflection;
@@ -113,6 +114,20 @@ namespace EpisconApi.Services
                 checkProduct.GetType().GetProperty(propInfo.Name).SetValue(checkProduct, propInfo.GetValue(product, null), null);
             }
 
+        }
+
+        public void Delete(int id)
+        {
+            Product productToDelete = _productRepo.GetById(id);
+            if (productToDelete == null) throw new Exception("Product Not Found");
+            _productRepo.Delete(productToDelete);
+        }
+
+        public IEnumerable<Product> DeleteRange(int[] ids)
+        {
+            List<Product> products = _productRepo.GetByIds(ids.ToList());
+            _productRepo.DeleteRange(products);
+            return products;
         }
 
         public List<Product> GetProductsFromUser(int userId)
