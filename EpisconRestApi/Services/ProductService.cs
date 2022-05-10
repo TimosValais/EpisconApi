@@ -1,4 +1,5 @@
 ﻿using EpisconApi.DBContexts;
+using EpisconApi.Helpers;
 using EpisconApi.Models;
 using EpisconApi.Repositories;
 using Newtonsoft.Json;
@@ -49,22 +50,53 @@ namespace EpisconApi.Services
         {
             //IEnumerable<Product> productsFromApi = await GetAllFromApi();
             //List<Product> products = productsFromApi.ToList();
-            PropertyInfo[] propInfos = typeof(Product).GetProperties();
-            PropertyInfo propertyToSort = null;
-            foreach (PropertyInfo propertyInfo in propInfos)
-            {
-                if (propertyInfo.Name.ToUpper() == sortBy.ToUpper())
-                {
-                    propertyToSort = propertyInfo;
-                    break;
-                }
-            }
-            List<Product> products = _productRepo.GetAll(limit, propertyToSort.Name, orderBy).ToList();
+
+            string propertyToSort = GetPropertyName(sortBy, typeof(Product), "title");
+  
+            List<Product> products = _productRepo.GetAll(limit, propertyToSort, orderBy).ToList();
 
             return products;
 
         }
-        public List<Product> GetUsersFromProduct(int userId)
+
+        private string GetPropertyName(string sortBy, Type type,string fallbackPropertyName = "")
+        {
+            PropertyInfo[] propInfos = type.GetProperties();
+            string propertyName = null;
+            foreach (PropertyInfo propertyInfo in propInfos)
+            {
+                if (propertyInfo.Name.ToUpper() == sortBy.ToUpper())
+                {
+                    propertyName = propertyInfo.Name;
+                    break;
+                }
+            }
+            if (!String.IsNullOrEmpty(fallbackPropertyName) && String.IsNullOrEmpty(propertyName))
+            {
+                propertyName =propInfos.FirstOrDefault(prop => prop.Name.ToUpper() == fallbackPropertyName.ToUpper()).Name;
+            }
+            if (String.IsNullOrEmpty(propertyName)) throw new Exception("Property not found");
+            return propertyName;
+        }
+
+        public async Task<IEnumerable<Product>> Search(SearchQueryParameters queryParameters)
+        {
+            PropertyInfo propInfo = typeof(Product).GetProperty(queryParameters.SearchField,BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+            if (propInfo == null) throw new Exception("Search Field Not Found");
+            IEnumerable<Product> products = _productRepo.Search(propInfo.Name, queryParameters.SearchTerm);
+            return products;
+        }
+
+
+
+        public async Task<IEnumerable<Product>> GetFromQuery(ProductQueryParameters queryParameters)
+        {
+            string propertyToSort = GetPropertyName(queryParameters.SortBy, typeof(Product), "title");
+            IEnumerable<Product> products = await _productRepo.GetFromQuery(queryParameters);
+            return products;
+        }
+
+        public List<Product> GetProductsFromUser(int userId)
         {
             List<int> productsIds = new List<int>();
             List<Purchase> purchases = _purchaseRepo.GetByUserId(userId).ToList();

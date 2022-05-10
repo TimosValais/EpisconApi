@@ -1,5 +1,7 @@
 ﻿using EpisconApi.DBContexts;
+using EpisconApi.Helpers;
 using EpisconApi.Models;
+using System.Reflection;
 
 namespace EpisconApi.Repositories
 {
@@ -48,7 +50,8 @@ namespace EpisconApi.Repositories
 
         public IEnumerable<Product> GetAll(int limit, string sortBy, string orderBy)
         {
-            var propertyInfo = typeof(Product).GetProperty(sortBy);
+            var propertyInfo = sortBy != null ? typeof(Product).GetProperty(sortBy) : typeof(Product).GetProperty("Title");
+            if (propertyInfo == null) throw new Exception("problem");
             if(orderBy.ToUpper() == "ASC")
             {
                 return _storeContext.Products.AsEnumerable().OrderBy(x => propertyInfo.GetValue(x, null)).Take(limit);
@@ -57,6 +60,56 @@ namespace EpisconApi.Repositories
             {
                 return _storeContext.Products.AsEnumerable().OrderByDescending(x => propertyInfo.GetValue(x, null)).Take(limit);
             }
+        }
+
+        public async Task<IEnumerable<Product>> GetFromQuery(ProductQueryParameters queryParameters)
+        {
+            var propertyInfo = typeof(Product).GetProperty(queryParameters.SortBy, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance) != null 
+                            ? typeof(Product).GetProperty(queryParameters.SortBy, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance) : 
+                            typeof(Product).GetProperty("Title");
+            IEnumerable<Product> products = null;
+            if(queryParameters.MinPrice != null)
+            {
+                products = _storeContext.Products.AsEnumerable().Where(product => product.Price >= queryParameters.MinPrice);
+            }
+            if(queryParameters.MaxPrice != null)
+            {
+                if(products != null) products = products.Where(product => product.Price <= queryParameters.MaxPrice);
+                else
+                {
+                   products = _storeContext.Products.AsEnumerable().Where(product => product.Price <= queryParameters.MaxPrice); 
+                }
+            }
+            if(products == null)
+            {
+                if (queryParameters.OrderBy.ToUpper() == "ASC")
+                {
+                    products = _storeContext.Products.AsEnumerable().OrderBy(x => propertyInfo.GetValue(x, null)).Skip(queryParameters.Size * (queryParameters.Page - 1)).Take(queryParameters.Size);
+                }
+                else
+                {
+                    products = _storeContext.Products.AsEnumerable().OrderByDescending(x => propertyInfo.GetValue(x, null)).Skip(queryParameters.Size * (queryParameters.Page - 1)).Take(queryParameters.Size);
+                }
+            }
+            else
+            {
+                if (queryParameters.OrderBy.ToUpper() == "ASC")
+                {
+                    products = products.OrderBy(x => propertyInfo.GetValue(x, null)).Skip(queryParameters.Size * (queryParameters.Page - 1)).Take(queryParameters.Size);
+                }
+                else
+                {
+                    products = products.OrderByDescending(x => propertyInfo.GetValue(x, null)).Skip(queryParameters.Size * (queryParameters.Page - 1)).Take(queryParameters.Size);
+                }
+            }
+            return products;
+   
+        }
+
+        public IEnumerable<Product> Search(string fieldName, string searchTerm)
+        {
+            IEnumerable<Product> products = _storeContext.Products.AsEnumerable().Where(product => Convert.ToString(product.GetType().GetProperty(fieldName).GetValue(product, null)).Contains(searchTerm,StringComparison.OrdinalIgnoreCase));
+            return products;
         }
 
         public List<Product> GetByIds(List<int> ids)

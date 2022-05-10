@@ -1,4 +1,5 @@
 ﻿using EpisconApi.DBContexts;
+using EpisconApi.Helpers;
 using EpisconApi.Models;
 using EpisconApi.Services;
 using Microsoft.AspNetCore.Http;
@@ -34,6 +35,34 @@ namespace EpisconApi.Controllers
 
         }
 
+        [HttpGet("All")]
+        public async Task<IActionResult> GetFromQuery([FromQuery] ProductQueryParameters queryParameters)
+        {
+            try
+            {
+                IEnumerable<Product> products = await _productService.GetFromQuery(queryParameters);
+                return Ok(products.ToList());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("Search")]
+        public async Task<IActionResult> SearchProducts([FromQuery] SearchQueryParameters queryParameters)
+        {
+            try
+            {
+                IEnumerable<Product> products = await _productService.Search(queryParameters);
+                return Ok(products.ToList());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpPut]
         [Route("SeedInitialData")]
         public async Task<HttpResponseMessage> SeedInitialData()
@@ -48,11 +77,11 @@ namespace EpisconApi.Controllers
 
         [Route("GetProductsFromUser/{userId}")]
         [HttpGet]
-        public object GetUsersFromProduct(int userId)
+        public object GetProductsFromUser(int userId)
         {
             try
             {
-                List<Product> users = _productService.GetUsersFromProduct(userId);
+                List<Product> users = _productService.GetProductsFromUser(userId);
                 return users;
             }
             catch (Exception ex)

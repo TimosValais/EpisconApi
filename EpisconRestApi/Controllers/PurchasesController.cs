@@ -3,7 +3,9 @@ using EpisconApi.Models;
 using EpisconApi.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Net;
+using System.Text;
 
 namespace EpisconApi.Controllers
 {
@@ -27,9 +29,12 @@ namespace EpisconApi.Controllers
                 _purchaseService.New(productId, userId);
                 return new HttpResponseMessage(HttpStatusCode.OK);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return new HttpResponseMessage(HttpStatusCode.BadRequest);
+                var response = new HttpResponseMessage();
+                response.StatusCode = HttpStatusCode.BadRequest;
+                response.Content = new StringContent(JsonConvert.SerializeObject(ex.Message));
+                return response;
             }
         }
 
