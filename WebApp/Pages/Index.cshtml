@@ -1,0 +1,57 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Products";
+}
+
+<div class="text-center">
+    <div class="btn-group row">
+        <button onclick="getProductsFromClick()" id="seed" class="btn btn-warning">Seed Initial Data</button>
+        <button onclick="showProductsOnClick()" id="show" class="btn btn-success">Fill Table</button>
+
+    </div>
+    <div class="form-outline row">
+        <div class="col-5">
+            <label class="form-label" for="minPrice">Minimum Price</label>
+            <input type="number" id="minPrice" class="form-control" value=0 />
+        </div>
+        <div class="col-5">
+            <label class="form-label" for="maxPrice">Maximum Price</label>
+            <input type="number" id="maxPrice" class="form-control" value=1000 />
+        </div>
+        <div class="col-2">
+            <label class="form-label" for="applyPrices">&nbsp</label>
+            <input type="button" id="applyPrices" class="form-control btn btn-primary" value="Apply" />
+        </div>
+    </div>
+    <h1 class="display-4">@ViewData["Title"]</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th id="titleHeader" class="mw-25">Title <i class="fa-solid fa-arrow-down-a-z float-left"></i></th>
+                <th id="priceHeader" class="mw-25">Price <i class="fa-solid fa-arrow-down-a-z float-left"></i></th>
+                <th id="descriptionHeader" class="mw-25">Description <i class="fa-solid fa-arrow-down-a-z float-left"></i></th>
+                <th id="categoryHeader" class="mw-25">Category <i class="fa-solid fa-arrow-down-a-z float-left"></i></th>
+                <th id="imageHeader" class="mw-25">Image <i class="fa-solid fa-arrow-down-a-z float-left"></i></th>
+                <th id="ratingHeader" class="mw-25">Rating <i class="fa-solid fa-arrow-down-a-z float-left"></i></th>
+            </tr>
+        </thead>
+        <tbody id="products">
+        </tbody>
+    </table>
+    <div class="row input-group">
+        <div class=col-10></div>
+        <div class="col-2 form-outline">
+            <label class="form-label" for="tableSize">TableSize</label>
+            <input type="number" id="tableSize" class="form-control" value="10"/>
+            <label class="form-label" for="tablePage">Page</label>
+            <input type="number" id="tablePage" class="form-control" value="1"/>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+<script src="js/api.js"></script>
+}
+

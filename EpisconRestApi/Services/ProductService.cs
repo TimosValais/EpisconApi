@@ -66,6 +66,7 @@ namespace EpisconApi.Services
             string propertyName = null;
             foreach (PropertyInfo propertyInfo in propInfos)
             {
+                if (String.IsNullOrEmpty(sortBy)) break;
                 if (propertyInfo.Name.ToUpper() == sortBy.ToUpper())
                 {
                     propertyName = propertyInfo.Name;
@@ -93,6 +94,7 @@ namespace EpisconApi.Services
         public async Task<IEnumerable<Product>> GetFromQuery(ProductQueryParameters queryParameters)
         {
             string propertyToSort = GetPropertyName(queryParameters.SortBy, typeof(Product), "title");
+            queryParameters.SortBy = propertyToSort;
             IEnumerable<Product> products = await _productRepo.GetFromQuery(queryParameters);
             return products;
         }
